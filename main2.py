@@ -64,7 +64,7 @@ def opening():
 					time.sleep(0.1)	
 					GPIO.output(buzzerSomeone, 1)
 					GPIO.output(buzzerNobody, 0)
-					server.messageServer("Fall")
+					server.messageServer("fall")
 					print "buzzerSomeone ON"
 				else:
 					GPIO.output(buzzerNobody, 1)
@@ -74,6 +74,7 @@ def opening():
 			if GPIO.input(xbeeButton) == True:
 				print "o cara ta na area ABRINDO"
 				#print GPIO.output(engineOpening)
+				server.messageServer("getin")
 				GPIO.output(buzzerSomeone, 0)
 				GPIO.output(buzzerNobody, 0)
 				if GPIO.input(openedSensor) == False:
@@ -91,7 +92,7 @@ def opening():
 				GPIO.output(buzzerSomeone, 0)
 				GPIO.output(buzzerNobody, 0)
 				print "ABRIU"
-				server.messageServer("Opened")
+				server.messageServer("open")
 				postOpening()
 				break
 
@@ -101,7 +102,6 @@ def forcedOpen():
 	GPIO.output(engineOpening, 1)
 	while True:
 		if GPIO.input(openedSensor) == False:
-			server.messageServer("Forced Opening")
 			GPIO.output(engineOpening, 0)
 			GPIO.output(buzzerSomeone, 0)
 			GPIO.output(buzzerNobody, 0)
@@ -117,6 +117,7 @@ def postOpening():
 			if GPIO.input(infraRed):
 				time.sleep(0.1)	
 				print "SAIU MAS TEM ALGUEM"
+				server.messageServer("getout")
 				GPIO.output(buzzerSomeone, 1)
 				time.sleep(0.5)	
 				GPIO.output(buzzerSomeone, 0)
@@ -141,12 +142,12 @@ def closing():
 			GPIO.output(buzzerSomeone, 1)
 			GPIO.output(engineClosing, 0)
 			print "CAIU ALGUEM"	
-			server.messageServer("Fall")	
+			server.messageServer("fall")	
 			forcedOpen()
 			break
 		if GPIO.input(closedSensor) == False:
 			print "FECHOU"
-			server.messageServer("Closed")
+			server.messageServer("close")
 			GPIO.output(engineClosing, 0)
 			GPIO.output(pump, 1)
 			waiting()
