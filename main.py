@@ -43,10 +43,13 @@ GPIO.output(pump, False)
 
 
 def opening():
-	print "opening()"
+	print "idle()"
 	print GPIO.input(start) ," ", GPIO.input(xbeeButton)
 	GPIO.output(buzzerSomeone, 0)
 	GPIO.output(buzzerNobody, 0)
+	if GPIO.input(infraRed):
+		print "manda info pro site"
+
 	if GPIO.input(start) and GPIO.input(xbeeButton):
 		time.sleep(1)					
 		GPIO.output(pump, 0)
@@ -59,12 +62,18 @@ def opening():
 				if GPIO.input(infraRed):
 					time.sleep(0.1)	
 					GPIO.output(buzzerSomeone, 1)
+					GPIO.output(buzzerNobody, 0)
 					print "buzzerSomeone ON"
 				else:
 					GPIO.output(buzzerNobody, 1)
+					GPIO.output(buzzerSomeone, 0)
 					print "buzzerNobody ON"
 
 			if GPIO.input(xbeeButton) == True:
+				print "o cara ta na area ABRINDO"
+				#print GPIO.output(engineOpening)
+				GPIO.output(buzzerSomeone, 0)
+				GPIO.output(buzzerNobody, 0)
 				if GPIO.input(openedSensor) == False:
 					time.sleep(0.3)
 					GPIO.output(engineOpening, 0)
@@ -111,6 +120,11 @@ def postOpening():
 			else:
 				time.sleep(1)
 				closing()
+
+		if GPIO.input(xbeeButton):
+			time.sleep(0.1)	
+			print "USANDO A PISCINA"
+			GPIO.output(buzzerSomeone, 0)
 
 def closing():
 	print "closing()"
