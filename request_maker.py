@@ -18,8 +18,9 @@ def eventHandler (pin):
     GPIO.output(7,False)
 
 def messageServer(message):
-	print "Mandei a requisição" + message 
-    httpServ.request('GET', message, 'root')
+	print "Request Sent " + message 
+	httpServ.request('GET', "/" + message + '/?user=root')
+	httpServ.getresponse()
 
 
 def deventHandler (pin):

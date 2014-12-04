@@ -35,6 +35,7 @@ GPIO.setup(closedSensor, GPIO.IN)
 GPIO.setup(crashSensor, GPIO.IN)
 GPIO.setup(infraRed, GPIO.IN)
 GPIO.setup(start, GPIO.IN)
+GPIO.setup(38, GPIO.IN)
 
 GPIO.output(buzzerNobody, False)
 GPIO.output(buzzerSomeone, False)
@@ -50,8 +51,9 @@ def opening():
 	GPIO.output(buzzerNobody, 0)
 	if GPIO.input(infraRed):
 		print "manda info pro site"
+		server.messageServer("sensors")
 
-	if GPIO.input(start) and GPIO.input(xbeeButton):
+	if (GPIO.input(start) or GPIO.input(38)) and GPIO.input(xbeeButton):
 		time.sleep(1)					
 		GPIO.output(pump, 0)
 		GPIO.output(engineOpening, 1)
@@ -64,7 +66,8 @@ def opening():
 					time.sleep(0.1)	
 					GPIO.output(buzzerSomeone, 1)
 					GPIO.output(buzzerNobody, 0)
-					server.messageServer("fall")
+					#server.messageServer("fall")
+					#server.messageServer("getout")
 					print "buzzerSomeone ON"
 				else:
 					GPIO.output(buzzerNobody, 1)
@@ -72,9 +75,9 @@ def opening():
 					print "buzzerNobody ON"
 
 			if GPIO.input(xbeeButton) == True:
+					#server.messageServer("getout")
 				print "o cara ta na area ABRINDO"
 				#print GPIO.output(engineOpening)
-				server.messageServer("getin")
 				GPIO.output(buzzerSomeone, 0)
 				GPIO.output(buzzerNobody, 0)
 				if GPIO.input(openedSensor) == False:
@@ -83,6 +86,7 @@ def opening():
 					GPIO.output(buzzerSomeone, 0)
 					GPIO.output(buzzerNobody, 0)
 					print "ABRIU"
+					server.messageServer("open")
 					postOpening()
 					break
 				
@@ -105,6 +109,7 @@ def forcedOpen():
 			GPIO.output(engineOpening, 0)
 			GPIO.output(buzzerSomeone, 0)
 			GPIO.output(buzzerNobody, 0)
+			server.messageServer("open")
 			postOpening()
 			break	
 
@@ -136,12 +141,21 @@ def closing():
 	GPIO.output(engineClosing, 1)
 	print GPIO.input(crashSensor) ," ", GPIO.input(infraRed)
 	while True:
-		if not GPIO.input(crashSensor) or GPIO.input(infraRed):
+		if not GPIO.input(crashSensor):
 			time.sleep(0.1)	
-			#Someone has fallen
+			#Crush detected
 			GPIO.output(buzzerSomeone, 1)
 			GPIO.output(engineClosing, 0)
-			print "CAIU ALGUEM"	
+			print "Esmagou"				
+			server.messageServer("crush")	
+			forcedOpen()
+			break
+		if  GPIO.input(infraRed):
+			time.sleep(0.1)	
+			#Someone has fallen			
+			GPIO.output(buzzerSomeone, 1)
+			GPIO.output(engineClosing, 0)
+			print "CAIU ALGUEM"				
 			server.messageServer("fall")	
 			forcedOpen()
 			break
